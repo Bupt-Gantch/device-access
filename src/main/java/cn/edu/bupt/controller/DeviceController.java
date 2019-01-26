@@ -439,4 +439,21 @@ public class DeviceController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/assignGateways", method = RequestMethod.GET)
+    public TextPageData<Device> getAllAssignGateways(
+            @RequestParam int limit,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String textSearch,
+            @RequestParam(required = false) String idOffset,
+            @RequestParam(required = false) String textOffset
+    ) throws Exception {
+        try{
+            TextPageLink pageLink = new TextPageLink(limit, textSearch, idOffset==null?null:toUUID(idOffset), textOffset);
+            return checkNotNull(deviceService.findAllAssignGateways("Gantch", "Gateway", pageLink));
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

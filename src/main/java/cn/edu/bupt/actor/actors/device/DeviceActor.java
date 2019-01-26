@@ -32,8 +32,13 @@ public class DeviceActor extends ContextAwareActor {
             SessionAwareMsg msg1 = ((BasicToDeviceActorSessionMsg) msg).getMsg();
             String deviceId = ((BasicToDeviceActorSessionMsg) msg).getDeviceId();
             if(msg1 instanceof SessionCloseMsg){
-                context().parent().tell(new DeviceTerminationMsg(deviceId), ActorRef.noSender());
-                context().stop(context().self());
+                if(processor.jugeWhetherDie(msg1.getSessionId())) {
+                    System.out.println("kill current device actor");
+                    context().parent().tell(new DeviceTerminationMsg(deviceId), ActorRef.noSender());
+                    context().stop(context().self());
+                }else{
+                    System.out.println("shoud not kill current device actor");
+                }
             }
         }else if(msg instanceof FromServerMsg){
             processor.process((FromServerMsg)msg);

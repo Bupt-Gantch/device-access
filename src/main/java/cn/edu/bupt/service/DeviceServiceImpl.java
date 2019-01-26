@@ -11,9 +11,7 @@ import cn.edu.bupt.dao.util.PaginatedRemover;
 import cn.edu.bupt.pojo.Device;
 import cn.edu.bupt.pojo.DeviceByGroupId;
 import cn.edu.bupt.pojo.DeviceCredentials;
-import cn.edu.bupt.pojo.Tenant;
 //import cn.edu.bupt.security.HttpUtil;
-import com.alibaba.fastjson.JSON;
 import com.google.gson.*;
 import okhttp3.*;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -250,6 +248,21 @@ public class DeviceServiceImpl implements DeviceService, InitializingBean{
         validatePageLink(pageLink, INCORRECT_PAGE_LINK + pageLink);
         List<Device> devices = deviceDao.findDevicesByDeviceType(deviceType,pageLink);
         return new TextPageData<>(devices, pageLink);
+    }
+
+    @Override
+    public TextPageData<Device> findAllAssignGateways(String manufacture, String deviceType, TextPageLink pageLink) {
+        validateString(manufacture, INCORRECT_MANUFACTURE);
+        validateString(deviceType, INCORRECT_DEVICE_TYPE);
+        validatePageLink(pageLink, INCORRECT_PAGE_LINK + pageLink);
+        List<Device> devices = deviceDao.findDevicesByManufactureAndDeviceType(manufacture, deviceType, pageLink);
+        List<Device> result = new ArrayList<>();
+        for(Device device : devices) {
+            if(device.getCustomerId() != 1){
+                result.add(device);
+            }
+        }
+        return new TextPageData<>(result, pageLink);
     }
 
 
