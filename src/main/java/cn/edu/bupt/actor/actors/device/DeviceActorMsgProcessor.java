@@ -203,7 +203,7 @@ public class DeviceActorMsgProcessor {
                 actorSystemContext.getNewWebSocketServer().sendMessage(obj.toString(),session);
         }
 
-        if(device.getDeviceType().equals("IASZone") || device.getDeviceType().equals("PM2.5") || device.getDeviceType().equals("lightSensor") || device.getDeviceType().equals("temperature")){
+        if(device.getDeviceType().equals("IASZone") || device.getDeviceType().equals("PM2.5") || device.getDeviceType().equals("lightSensor") || device.getDeviceType().equals("temperature") || device.getDeviceType().equals("lock")){
             KafkaUtil.send("",obj.toString());
         }
 
