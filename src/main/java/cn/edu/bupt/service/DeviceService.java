@@ -47,6 +47,8 @@ public interface DeviceService {
 
     TextPageData<Device> findDevicesByDeviceType(String deviceType, TextPageLink pageLink);
 
+    TextPageData<Device> findAllAssignGateways(String manufacture, String deviceType, TextPageLink pageLink);
+
     TextPageData<Device> findDevicesByTenantIdAndSiteId(Integer tenantId, Integer siteId, TextPageLink pageLink);
 
     TextPageData<Device> findDevices(Integer tenantId, TextPageLink pageLink);

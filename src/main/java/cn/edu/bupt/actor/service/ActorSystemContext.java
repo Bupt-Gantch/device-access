@@ -42,6 +42,9 @@ public class ActorSystemContext {
     @Autowired
     @Getter private NewWebSocketServer newWebSocketServer;
 
+    @Autowired
+    @Getter private ModelService modelService;
+
 //    @Autowired
 //    @Getter private TenantService tenantService;
 
