@@ -31,6 +31,15 @@ public class RpcController extends BaseController {
     @Autowired
     DeviceService deviceService;
 
+
+    /**
+     * send control message to ZigBee module
+     * @param data
+     * @param deviceId
+     * @param requestId
+     * @return
+     * @throws Exception
+     */
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/{deviceId}/{requestId}", method = RequestMethod.POST)
     public DeferredResult<ResponseEntity> sendRpcCommandToDevice(@RequestBody String data, @PathVariable String deviceId,
