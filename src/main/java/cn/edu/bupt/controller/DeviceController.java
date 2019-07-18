@@ -439,6 +439,34 @@ public class DeviceController extends BaseController {
         }
     }
 
+    /**
+     * 解绑网关并删除网管下所有设备
+     * @param customerId
+     * @param gateway_name
+     * @throws Exception
+     */
+    @RequestMapping(value = "/removeGateway/{customerId}", method = RequestMethod.GET)
+    public void removeGateway(@PathVariable("customerId") Integer customerId, @RequestParam String gateway_name) throws Exception{
+        if(deviceService.findDeviceByTenantIdAndName(2, gateway_name).isPresent()){
+            Device gateway = deviceService.findDeviceByTenantIdAndName(2, gateway_name).get();
+            UUID gId = gateway.getId();
+            int gatewayCustomerId = gateway.getCustomerId();
+            // 校验用户操作权限
+            if(gatewayCustomerId == customerId){
+                deviceService.unassignDeviceFromCustomer(gId);
+                List<Device> devices = deviceService.findDeviceByParentDeviceId(gId.toString(), new TextPageLink(255));
+                for(Device de : devices){
+                    deviceService.deleteDevice(de.getId());
+                }
+            }else{
+                throw new Exception("Don't has been authorized!");
+            }
+
+        }else{
+            throw new Exception("Don't has such gateway!");
+        }
+    }
+
     @RequestMapping(value = "/assignGateways", method = RequestMethod.GET)
     public TextPageData<Device> getAllAssignGateways(
             @RequestParam int limit,
