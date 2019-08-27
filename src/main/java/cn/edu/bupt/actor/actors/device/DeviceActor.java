@@ -37,7 +37,7 @@ public class DeviceActor extends ContextAwareActor {
                     context().parent().tell(new DeviceTerminationMsg(deviceId), ActorRef.noSender());
                     context().stop(context().self());
                 }else{
-                    System.out.println("shoud not kill current device actor");
+                    System.out.println("should not kill current device actor");
                 }
             }
         }else if(msg instanceof FromServerMsg){

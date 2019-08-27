@@ -21,7 +21,8 @@ public class HttpUtil {
     }
     public static JsonObject getDeviceServiceDes(String manufacture, String deviceType, String model,String serviceName) throws IOException{
 //        String url = "http://172.24.32.167:8000/api/v1/ability/"+manufacture+"/"+deviceType+"/"+model;
-        String url = "http://servicemanagement:8000/api/v1/servicemanagement/ability/"+manufacture+"/"+deviceType+"/"+model;
+//        String url = "http://servicemanagement:8000/api/v1/servicemanagement/ability/"+manufacture+"/"+deviceType+"/"+model;
+        String url = "http://smart.gantch.cn:30080/api/v1/servicemanagement/ability/"+manufacture+"/"+deviceType+"/"+model;
         Request.Builder builder = new Request.Builder()
                 .url(url)
                 .get() ;

@@ -97,7 +97,8 @@ public class DeviceActorMsgProcessor {
             BasicFromServerRpcMsg msg1 = (BasicFromServerRpcMsg)(msg);
             int requestId = msg1.getRpcRequestId();
             if(msg1.requireResponse()){
-                rpcRequests.put(requestId,msg1.getRes());
+//            if(requestId > 100){  // requestId > 100 表示需要返回值
+//                rpcRequests.put(requestId,msg1.getRes());
                 msg1.getRes().onTimeout(()->{
                     rpcRequests.remove(requestId);
                 });
@@ -120,7 +121,7 @@ public class DeviceActorMsgProcessor {
     }
 
     public boolean jugeWhetherDie(SessionId id){
-        System.out.println("start to juge whether die nd session = " +id);
+        System.out.println("start to judge whether die and session = " +id);
         subscriptions.forEach((k,v) -> {
             System.out.println(k+"=>"+v);
         });

@@ -28,7 +28,7 @@ public class SessionManagerActor extends ContextAwareActor {
 
     @Override
     public void onReceive(Object msg) throws Exception {
-        System.out.println("sessionmanager receive "+ msg);
+        System.out.println("SessionManager receive "+ msg);
         if(msg instanceof SessionCtrlMsg){
             onSessionCtrlMsg((SessionCtrlMsg)msg);
         }else if(msg instanceof SessionAwareMsg){

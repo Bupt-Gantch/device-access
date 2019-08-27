@@ -39,8 +39,10 @@ public class AppActor extends ContextAwareActor {
             process((FromSessionActorToDeviceActorMsg)msg);
         }else if(msg instanceof FromServerMsg){
             process((FromServerMsg)msg);
+            System.out.println("FromServerMsg");
         }else if(msg instanceof BasicFromServerMsg){
             process((BasicFromServerMsg)msg);
+            System.out.println("BasicFromServerMsg");
         }
     }
 
@@ -62,7 +64,7 @@ public class AppActor extends ContextAwareActor {
 
     private ActorRef getOrCreateTenantActor(String tenantId) {
         return tenantActors.computeIfAbsent(tenantId, k -> context().actorOf(Props.create(new TenantActor.ActorCreator(systemContext, tenantId))
-                .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), tenantId.toString()));
+                .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), tenantId));
     }
 
     private final SupervisorStrategy strategy = new OneForOneStrategy(3, Duration.create("1 minute"), new Function<Throwable, SupervisorStrategy.Directive>() {

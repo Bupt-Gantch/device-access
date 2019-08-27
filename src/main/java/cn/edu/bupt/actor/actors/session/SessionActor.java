@@ -45,7 +45,7 @@ public class SessionActor extends ContextAwareActor{
         }else if(msg instanceof FromSessionActorToDeviceActorMsg){
             processFromSessionActorToDeviceActorMsg((FromSessionActorToDeviceActorMsg)msg);
         }else if(msg instanceof SessionTimeoutMsg){
-
+            System.out.println("Session " + ((SessionTimeoutMsg) msg).getSessionId() + " Time out");
         }
     }
 

@@ -3,6 +3,7 @@ package cn.edu.bupt.message;
 import cn.edu.bupt.pojo.Device;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -18,6 +19,7 @@ public class BasicFromServerRpcMsg  implements FromServerRpcMsg{
     @Getter
     private final DeferredResult<ResponseEntity> res;
 
+    @Setter
     private final JsonObject service;
 
 
@@ -51,6 +53,10 @@ public class BasicFromServerRpcMsg  implements FromServerRpcMsg{
     @Override
     public String getTenantId() {
         return device.getTenantId()+"";
+    }
+
+    public void setService(boolean required) {
+       this.service.addProperty("requireResponse", required);
     }
 
     @Override
