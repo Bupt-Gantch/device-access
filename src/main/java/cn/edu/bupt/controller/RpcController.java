@@ -12,11 +12,13 @@ import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.*;
 
 /**
  * Created by Administrator on 2018/4/24.
@@ -42,8 +44,10 @@ public class RpcController extends BaseController {
      */
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/{deviceId}/{requestId}", method = RequestMethod.POST)
-    public DeferredResult<ResponseEntity> sendRpcCommandToDevice(@RequestBody String data, @PathVariable String deviceId,
-                                                                 @PathVariable int requestId)throws Exception{
+    public DeferredResult<ResponseEntity> sendRpcCommandToDevice(@RequestBody String data,
+                                                                 @PathVariable String deviceId,
+                                                                 @PathVariable int requestId,
+                                                                 @RequestParam(required = false)boolean response)throws Exception{
         DeferredResult<ResponseEntity> res = new DeferredResult<>();
         Device device = deviceService.findDeviceById(UUID.fromString(deviceId));
         if(device==null) {
@@ -53,23 +57,29 @@ public class RpcController extends BaseController {
         JsonObject serviceObj = HttpUtil.getDeviceServiceDes(device.getManufacture(),device.getDeviceType(),
                 device.getModel(),new JsonParser().parse(data).getAsJsonObject().get("serviceName").getAsString());
         String pid= device.getParentDeviceId();
+
         BasicFromServerRpcMsg msg;
         if (pid==null||"".equals(pid)){
-            msg    = new BasicFromServerRpcMsg(requestId,data,device,res,serviceObj);
+            msg = new BasicFromServerRpcMsg(requestId,data,device,res,serviceObj);
         }else{
             Device  pdevice = deviceService.findDeviceById(UUID.fromString(pid));
-            msg    = new BasicFromServerRpcMsg(requestId,data,pdevice,res,serviceObj);
+            msg = new BasicFromServerRpcMsg(requestId,data,pdevice,res,serviceObj);
         }
+
+        // 发送 rpc 控制指令
+        msg.setService(response);
         rpcMsgProcessor.process(msg);
+
+        //  发送控制设备事件
         Event event = new Event();
         event.setEntityId(deviceId);
         event.setTenantId(device.getTenantId());
         event.setEntityType(EntityType.DEVICE);
-        //JsonObject object = new JsonParser().parse(data).getAsJsonObject();
         event.setBody(data);
         event.setEventType("TestType");
         baseEventService.save(event);
         deviceService.sendMessage(device,"对"+device.getName()+"设备进行了控制");
+
         return res;
     }
 }
