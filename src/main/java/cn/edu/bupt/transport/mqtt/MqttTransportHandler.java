@@ -93,6 +93,7 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         if(!checkConnected(ctx)){
             return ;
         }
+//        System.out.println("subscribe: " + msg);
         List<Integer> grantedQoSList = new ArrayList<>();
         for(MqttTopicSubscription subscription : msg.payload().topicSubscriptions()){
             String topicName = subscription.topicName();
@@ -141,21 +142,23 @@ public class MqttTransportHandler extends ChannelInboundHandlerAdapter implement
         }
         String topicName = mqttMsg.variableHeader().topicName();
         int msgId = mqttMsg.variableHeader().messageId();
-
+//        System.out.println("publish:" + mqttMsg);
         processDevicePublish(ctx, mqttMsg, topicName, msgId);
     }
 
     private void processDevicePublish(ChannelHandlerContext ctx, MqttPublishMessage mqttMsg, String topicName, int msgId) {
         AdaptorToSessionActorMsg msg = null ;
-        try{
+        try{   //TODO 其他数据类型处理
             if(topicName.equals(MqttTopics.DEVICE_TELEMETRY_TOPIC)){
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_TELEMETRY_REQUEST,mqttMsg);
             }else if(topicName.equals(MqttTopics.DEVICE_ATTRIBUTES_TOPIC)){
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.POST_ATTRIBUTE_REQUEST,mqttMsg);
             }else if(topicName.startsWith(MqttTopics.DEVICE_RPC_RESPONSE_TOPIC)){
                 msg = adaptor.convertToActorMsg(deviceSessionCtx, MsgType.FROM_DEVICE_RPC_RESPONSE,mqttMsg);
+            } else {
+                System.out.println("convert data error: unknown Type");
             }
-            //TODO 其他数据类型处理
+
         }catch(Exception e){
             //TODO 异常待处理
         }

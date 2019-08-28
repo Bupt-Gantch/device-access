@@ -76,19 +76,20 @@ public class DeviceActorMsgProcessor {
                 subscriptions.remove(adptorMsg.getSessionId().toUidStr());
                 break;
             case MsgType.FROM_DEVICE_RPC_RESPONSE:
-                System.err.println("receive a rpc  response");
+                System.err.println("receive a rpc response");
                 int requestId = ((FromDeviceRpcResponse)fromDeviceMsg).getRequestId();
                 DeferredResult result = rpcRequests.get(requestId);
                 if(result == null){
                     //TODO 记录一下rpc超时
+                    System.err.println("request [" + requestId + "] rpc overtime");
                 }else{
                     result.setResult(((FromDeviceRpcResponse)fromDeviceMsg).getData());
                     rpcRequests.remove(requestId);
                 }
                 break;
-            default:{
+            default:
                 System.err.println("unKnow msg type");
-                }
+                break;
         }
     }
 
@@ -97,8 +98,7 @@ public class DeviceActorMsgProcessor {
             BasicFromServerRpcMsg msg1 = (BasicFromServerRpcMsg)(msg);
             int requestId = msg1.getRpcRequestId();
             if(msg1.requireResponse()){
-//            if(requestId > 100){  // requestId > 100 表示需要返回值
-//                rpcRequests.put(requestId,msg1.getRes());
+                rpcRequests.put(requestId, msg1.getRes());
                 msg1.getRes().onTimeout(()->{
                     rpcRequests.remove(requestId);
                 });

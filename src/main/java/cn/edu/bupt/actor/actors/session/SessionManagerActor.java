@@ -61,6 +61,8 @@ public class SessionManagerActor extends ContextAwareActor {
             try{
                 getOrCreateSessionActor(msg.getSessionId()).tell(msg,self());
             }catch(Exception e){
+                System.out.println("method [getOrCreateSessionActor] throws an Exception");
+                e.printStackTrace();
                 //TODO 待补全
             }
         }else{
@@ -75,7 +77,7 @@ public class SessionManagerActor extends ContextAwareActor {
         }
     }
 
-    private ActorRef getOrCreateSessionActor(SessionId sessionId) {
+    private ActorRef getOrCreateSessionActor(SessionId sessionId) throws Exception{
         String sessionIdStr = sessionId.toUidStr();
         ActorRef sessionActor = sessionActors.get(sessionIdStr);
         if(sessionActor == null){
