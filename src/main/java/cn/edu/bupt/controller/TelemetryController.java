@@ -26,8 +26,7 @@ public class TelemetryController extends BaseController {
                                       @RequestParam String endTs,
                                       @RequestParam int interval,
                                       @RequestParam int limit,
-                                      @RequestParam String aggregation
-                                      ) throws Exception {
+                                      @RequestParam String aggregation) {
         try{
             List<TsKvQuery> queries = new ArrayList<>();
             TsKvQuery tsKvQuery = new BaseTsKvQuery(key, Long.parseLong(startTs), Long.parseLong(endTs), interval, limit, Aggregation.valueOf(aggregation));
@@ -44,8 +43,7 @@ public class TelemetryController extends BaseController {
     //通过设备ID获取所有键的最新数据
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/alllatestdata/{deviceId}", method = RequestMethod.GET)
-    public List<TsKvEntry> getlatestData(@PathVariable("deviceId") String deviceId)
-    throws Exception{
+    public List<TsKvEntry> getlatestData(@PathVariable("deviceId") String deviceId) {
         try{
             ListenableFuture<List<TsKvEntry>> tskventry = baseTimeseriesService.findAllLatest(toUUID(deviceId));
             List<TsKvEntry> ls = tskventry.get();
@@ -76,7 +74,7 @@ public class TelemetryController extends BaseController {
     //获取所有的数据的键类型
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/allKeys/{deviceId}", method = RequestMethod.GET)
-    public List<String> findAllKeys(@PathVariable("deviceId") String deviceId) throws Exception{
+    public List<String> findAllKeys(@PathVariable("deviceId") String deviceId) {
         try{
             ListenableFuture<List<String>> listListenableFuture = baseTimeseriesService.findAllKeys(toUUID(deviceId));
             List<String> ls = listListenableFuture.get();
