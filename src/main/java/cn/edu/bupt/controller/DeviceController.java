@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +39,7 @@ public class DeviceController extends BaseController {
 
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('CUSTOMER_USER')")
     @RequestMapping(value = "/customer/deviceCount", method = RequestMethod.GET)
-    public Long getCustomerDeviceCount(@RequestParam Integer tenantId,@RequestParam Integer customerId) throws IOTException {
+    public Long getCustomerDeviceCount(@RequestParam Integer tenantId,@RequestParam Integer customerId) {
 //        try {
 //            if (getCurrentUser().getCustomerId().equals(customerId)||
 //                    ((getCurrentUser().getAuthority().equals(Authority.TENANT_ADMIN))&&getCurrentUser().getTenantId().equals(tenantId))) {
@@ -65,7 +64,7 @@ public class DeviceController extends BaseController {
 
             Device savedDevice = checkNotNull(deviceService.saveDevice(device1));
 
-            deviceService.sendMessage(savedDevice,"新增/更新设备："+savedDevice.getName());
+//            deviceService.sendMessage(savedDevice,"新增/更新设备："+savedDevice.getName());
             return savedDevice.toString();
         } catch (Exception e) {
             return onFail(e.toString());
@@ -90,18 +89,18 @@ public class DeviceController extends BaseController {
     //删除设备
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/device/{deviceId}", method = RequestMethod.DELETE)
-    public void deleteDevice(@PathVariable(DEVICE_ID) String strDeviceId) throws Exception {
-        if (StringUtil.isEmpty(strDeviceId)) {
-            throw new Exception("can't be empty");
-        }
+    public void deleteDevice(@PathVariable(DEVICE_ID) String strDeviceId) {
+
         try {
+            if (StringUtil.isEmpty(strDeviceId)) {
+                throw new Exception("device id can't be empty");
+            }
             Device device = deviceService.findDeviceById(toUUID(strDeviceId));
             deviceService.deleteDevice(toUUID(strDeviceId));
 
-            deviceService.sendMessage(device, "删除设备："+device.getName());
+//            deviceService.sendMessage(device, "删除设备："+device.getName());
         } catch (Exception e) {
             e.printStackTrace();
-            return ;
         }
     }
 
@@ -109,11 +108,12 @@ public class DeviceController extends BaseController {
     //通过设备ID查找设备
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/device/{deviceId}", method = RequestMethod.GET)
-    public Device getDeviceById(@PathVariable(DEVICE_ID) String strDeviceId) throws Exception {
-        if (StringUtil.isEmpty(strDeviceId)) {
-           throw new Exception("can't be empty");
-        }
+    public Device getDeviceById(@PathVariable(DEVICE_ID) String strDeviceId) {
+
         try {
+            if (StringUtil.isEmpty(strDeviceId)) {
+                throw new Exception("can't be empty");
+            }
             Device device = deviceService.findDeviceById(toUUID(strDeviceId));
             return device;
         } catch (Exception e) {
@@ -474,7 +474,7 @@ public class DeviceController extends BaseController {
             @RequestParam(required = false) String textSearch,
             @RequestParam(required = false) String idOffset,
             @RequestParam(required = false) String textOffset
-    ) throws Exception {
+    ) {
         try{
             TextPageLink pageLink = new TextPageLink(limit, textSearch, idOffset==null?null:toUUID(idOffset), textOffset);
             return checkNotNull(deviceService.findAllAssignGateways("Gantch", "Gateway", pageLink));

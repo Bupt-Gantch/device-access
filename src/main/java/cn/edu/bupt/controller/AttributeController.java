@@ -16,12 +16,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/deviceaccess")
-public class  AttributeController extends BaseController {
+public class AttributeController extends BaseController {
 
     //通过设备ID获取全部属性
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value="/allattributes/{deviceId}", method = RequestMethod.GET)
-    public List<AttributeKvEntry> getAllAttributes(@PathVariable("deviceId") String deviceId) throws Exception {
+    public List<AttributeKvEntry> getAllAttributes(@PathVariable("deviceId") String deviceId) {
         try{
             ListenableFuture<List<AttributeKvEntry>> attributeKvEntry = baseAttributesService.findAll(toUUID(deviceId));
             List<AttributeKvEntry> ls = attributeKvEntry.get();
@@ -68,7 +68,7 @@ public class  AttributeController extends BaseController {
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value="/allattributes/{deviceId}/{keys}",method = RequestMethod.DELETE)
     public void removeAllAttributes(
-            @PathVariable("deviceId") String deviceId, @PathVariable("keys") String keys) throws Exception{
+            @PathVariable("deviceId") String deviceId, @PathVariable("keys") String keys) {
         try{
             List<String> ls = new ArrayList<>();
             ls.add(keys);
