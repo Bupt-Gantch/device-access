@@ -39,13 +39,14 @@ public class AppActor extends ContextAwareActor {
             process((FromSessionActorToDeviceActorMsg)msg);
         }else if(msg instanceof FromServerMsg){
             process((FromServerMsg)msg);
-            System.out.println("FromServerMsg");
+            //System.out.println("FromServerMsg");
         }else if(msg instanceof BasicFromServerMsg){
             process((BasicFromServerMsg)msg);
-            System.out.println("BasicFromServerMsg");
+            //System.out.println("BasicFromServerMsg");
         }
     }
 
+    // 从平台下发的消息
     private void process(FromServerMsg msg) {
         if(msg.getMsgType().equals(MsgType.FROM_SERVER_RPC_MSG)){
             String tenantId = ((BasicFromServerRpcMsg)msg).getTenantId();
@@ -53,12 +54,14 @@ public class AppActor extends ContextAwareActor {
         }
     }
 
+    // 上传到平台的消息
     private void process(FromSessionActorToDeviceActorMsg msg) {
         getOrCreateTenantActor(msg.getTenantId()).tell(msg,ActorRef.noSender());
     }
 
+    // useless
     private void process(BasicFromServerMsg msg) {
-        String tenantId = msg .getTenantId();
+        String tenantId = msg.getTenantId();
         getOrCreateTenantActor(tenantId).tell(msg,ActorRef.noSender());
     }
 
@@ -67,6 +70,7 @@ public class AppActor extends ContextAwareActor {
                 .withDispatcher(DefaultActorService.CORE_DISPATCHER_NAME), tenantId));
     }
 
+    // 对子actor监管策略 OneForOne:表示该策略仅适用于当前actor的子actor
     private final SupervisorStrategy strategy = new OneForOneStrategy(3, Duration.create("1 minute"), new Function<Throwable, SupervisorStrategy.Directive>() {
         @Override
         public SupervisorStrategy.Directive apply(Throwable t) {
@@ -78,6 +82,7 @@ public class AppActor extends ContextAwareActor {
         }
     });
 
+    // 实现Create工厂类
     public static class ActorCreator implements Creator<AppActor> {
         private static final long serialVersionUID = 1L;
         private final transient ActorSystemContext context;

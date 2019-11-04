@@ -49,6 +49,7 @@ public class DeviceActorMsgProcessor {
         this.actorSystemContext = actorSystemContext;
     }
 
+    // 处理上传到平台的消息
     public void process(BasicToDeviceActorMsg msg) throws IOException {
         BasicToDeviceActorMsg msg1 = (BasicToDeviceActorMsg)msg;
         AdaptorToSessionActorMsg adptorMsg = msg1.getMsg();
@@ -93,12 +94,13 @@ public class DeviceActorMsgProcessor {
         }
     }
 
+    // 处理平台下发到物接入协议模块的消息
     public void process(FromServerMsg msg) {
         if(msg.getMsgType().equals(MsgType.FROM_SERVER_RPC_MSG)){
             BasicFromServerRpcMsg msg1 = (BasicFromServerRpcMsg)(msg);
             int requestId = msg1.getRpcRequestId();
-            if(msg1.requireResponse()){
-                rpcRequests.put(requestId, msg1.getRes());
+            if(msg1.requireResponse()){  // 该服务需要返回值
+                rpcRequests.put(requestId, msg1.getRes());  // map 保存<requestId, response>
                 msg1.getRes().onTimeout(()->{
                     rpcRequests.remove(requestId);
                 });

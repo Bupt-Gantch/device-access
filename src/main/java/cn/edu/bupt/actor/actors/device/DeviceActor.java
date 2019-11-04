@@ -28,6 +28,7 @@ public class DeviceActor extends ContextAwareActor {
     public void onReceive(Object msg) throws Exception {
         if(msg instanceof BasicToDeviceActorMsg){
             processor.process((BasicToDeviceActorMsg)msg);
+
         }else if(msg instanceof BasicToDeviceActorSessionMsg){
             SessionAwareMsg msg1 = ((BasicToDeviceActorSessionMsg) msg).getMsg();
             String deviceId = ((BasicToDeviceActorSessionMsg) msg).getDeviceId();
@@ -40,6 +41,7 @@ public class DeviceActor extends ContextAwareActor {
                     System.out.println("should not kill current device actor");
                 }
             }
+
         }else if(msg instanceof FromServerMsg){
             processor.process((FromServerMsg)msg);
         }
