@@ -2,7 +2,6 @@ package cn.edu.bupt.service;
 
 import cn.edu.bupt.dao.device.DeviceByGroupIdDao;
 import cn.edu.bupt.dao.device.DeviceDao;
-import cn.edu.bupt.dao.device.GroupDao;
 import cn.edu.bupt.dao.exception.DataValidationException;
 import cn.edu.bupt.dao.page.TextPageData;
 import cn.edu.bupt.dao.page.TextPageLink;
@@ -12,8 +11,6 @@ import cn.edu.bupt.pojo.Device;
 import cn.edu.bupt.pojo.DeviceByGroupId;
 import cn.edu.bupt.pojo.DeviceCredentials;
 //import cn.edu.bupt.security.HttpUtil;
-import com.google.gson.*;
-import okhttp3.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,16 +47,16 @@ public class DeviceServiceImpl implements DeviceService, InitializingBean{
     @Autowired
     private DeviceDao deviceDao;
 
-    //private HttpUtil httpUtil = new HttpUtil();
+//    private HttpUtil httpUtil = new HttpUtil();
 //
 //    @Autowired
 //    private TenantDao tenantDao;
 //
 //    @Autowired
 //    private CustomerDao customerDao;
-
-    @Autowired
-    private GroupDao groupDao;
+//
+//    @Autowired
+//    private GroupDao groupDao;
 
     @Autowired
     private DeviceCredentialsService deviceCredentialsService;
@@ -481,53 +477,53 @@ public class DeviceServiceImpl implements DeviceService, InitializingBean{
 //        }
 //    }
 
-    public String sendMessage(Device device, String message){
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("message",message);
-        jsonObject.addProperty("messageType", "fromModule");
-        jsonObject.addProperty("ts", System.currentTimeMillis());
-        jsonObject.addProperty("tenantId",device.getTenantId());
+//    public String sendMessage(Device device, String message){
+//        JsonObject jsonObject = new JsonObject();
+//        jsonObject.addProperty("message",message);
+//        jsonObject.addProperty("messageType", "fromModule");
+//        jsonObject.addProperty("ts", System.currentTimeMillis());
+//        jsonObject.addProperty("tenantId",device.getTenantId());
+//
+//
+//        OkHttpClient client = new OkHttpClient();
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8")
+//                , jsonObject.toString());
+//
+//        System.out.println(requestBody);
+//
+//        Request request = new Request.Builder()
+//                .url("http://127.0.0.1:30009/api/v1/updatemessageplugin/updateMessage/insert")
+//                .post(requestBody)
+//                .build();
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                System.out.println(e);
+//            }
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                if(response.isSuccessful()){
+//                    System.out.println("Success");
+//                }
+//            }
+//        });
+//        return "Success";
+//    }
 
-
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8")
-                , jsonObject.toString());
-
-        System.out.println(requestBody);
-
-        Request request = new Request.Builder()
-                .url("http://127.0.0.1:30009/api/v1/updatemessageplugin/updateMessage/insert")
-                .post(requestBody)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                System.out.println(e);
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if(response.isSuccessful()){
-                    System.out.println("Success");
-                }
-            }
-        });
-        return "Success";
-    }
-
-    public void checkData(TextPageData pageData){
-        String message = null;
-        for(Object object:pageData.getData())
-        {
-            Device device = (Device)object;
-            if((device.getLifeTime()-System.currentTimeMillis())<=15552000000L && (device.getLifeTime()-System.currentTimeMillis())>15465600000L ){
-                message = device.getName()+"设备距离检修年限不足6个月";
-                sendMessage(device,message);
-            }
-            if((device.getLifeTime()-System.currentTimeMillis())<=2592000000L && (device.getLifeTime()-System.currentTimeMillis())>2505600000L ){
-                message = device.getName()+"设备距离检修年限不足1个月";
-                sendMessage(device,message);
-            }
-        }
-    }
+//    public void checkData(TextPageData pageData){
+//        String message = null;
+//        for(Object object:pageData.getData())
+//        {
+//            Device device = (Device)object;
+//            if((device.getLifeTime()-System.currentTimeMillis())<=15552000000L && (device.getLifeTime()-System.currentTimeMillis())>15465600000L ){
+//                message = device.getName()+"设备距离检修年限不足6个月";
+//                sendMessage(device,message);
+//            }
+//            if((device.getLifeTime()-System.currentTimeMillis())<=2592000000L && (device.getLifeTime()-System.currentTimeMillis())>2505600000L ){
+//                message = device.getName()+"设备距离检修年限不足1个月";
+//                sendMessage(device,message);
+//            }
+//        }
+//    }
 
 }
