@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -34,6 +35,7 @@ public class RpcController extends BaseController {
 
     /**
      * send control message to ZigBee module
+     *
      * @param data
      * @param deviceId
      * @param requestId
@@ -45,36 +47,37 @@ public class RpcController extends BaseController {
     public DeferredResult<ResponseEntity> sendRpcCommandToDevice(@RequestBody String data,
                                                                  @PathVariable String deviceId,
                                                                  @PathVariable int requestId,
-                                                                 @RequestParam(required = false)boolean response)throws Exception{
-        DeferredResult<ResponseEntity> res = new DeferredResult<>();
-        Device device = deviceService.findDeviceById(UUID.fromString(deviceId));
-        if(device==null) {
-            res.setResult(new ResponseEntity(HttpStatus.BAD_REQUEST));
-            return res;
-        }
-        JsonObject serviceObj = HttpUtil.getDeviceServiceDes(device.getManufacture(),device.getDeviceType(),
-                device.getModel(),new JsonParser().parse(data).getAsJsonObject().get("serviceName").getAsString());
-        String pid= device.getParentDeviceId();
-
+                                                                 @RequestParam(required = false) boolean response) {
         try {
-            BasicFromServerRpcMsg msg;
-            if(Strings.isNullOrEmpty(pid)) {
-//            if (pid == null || "".equals(pid)) {
-                msg = new BasicFromServerRpcMsg(requestId, data, device, res, serviceObj);
-            } else {
-                Device pdevice = deviceService.findDeviceById(UUID.fromString(pid));
-                msg = new BasicFromServerRpcMsg(requestId, data, pdevice, res, serviceObj);
+            DeferredResult<ResponseEntity> res = new DeferredResult<>();
+            Device device = deviceService.findDeviceById(UUID.fromString(deviceId));
+            if (device == null) {
+                res.setResult(new ResponseEntity(HttpStatus.BAD_REQUEST));
+                return res;
+            }
+            JsonObject serviceObj = HttpUtil.getDeviceServiceDes(device.getManufacture(), device.getDeviceType(),
+                    device.getModel(), new JsonParser().parse(data).getAsJsonObject().get("serviceName").getAsString());
+            String pid = device.getParentDeviceId();
+
+            try {
+                BasicFromServerRpcMsg msg;
+                if (Strings.isNullOrEmpty(pid)) {
+                    //            if (pid == null || "".equals(pid)) {
+                    msg = new BasicFromServerRpcMsg(requestId, data, device, res, serviceObj);
+                } else {
+                    Device pdevice = deviceService.findDeviceById(UUID.fromString(pid));
+                    msg = new BasicFromServerRpcMsg(requestId, data, pdevice, res, serviceObj);
+                }
+
+                // 发送 rpc 控制指令
+                //        msg.setService(response);
+                rpcMsgProcessor.process(msg);
+            } catch (Exception e) {
+                System.out.println("pid = " + pid + " and pid.length() =  " + pid.length());
+                System.err.println(e.getMessage());
             }
 
-            // 发送 rpc 控制指令
-//        msg.setService(response);
-            rpcMsgProcessor.process(msg);
-        } catch (Exception e) {
-            System.out.println("pid = "+ pid + " and pid.length() =  "+ pid.length());
-            System.err.println(e.getMessage());
-        }
-
-        //  发送控制设备事件
+            //  发送控制设备事件
 //        Event event = new Event();
 //        event.setEntityId(deviceId);
 //        event.setTenantId(device.getTenantId());
@@ -84,6 +87,10 @@ public class RpcController extends BaseController {
 //        baseEventService.save(event);
 //        deviceService.sendMessage(device,"对"+device.getName()+"设备进行了控制");
 
-        return res;
+            return res;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

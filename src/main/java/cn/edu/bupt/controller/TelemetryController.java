@@ -59,8 +59,7 @@ public class TelemetryController extends BaseController {
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/latestdata/{deviceId}/{keys}", method = RequestMethod.GET)
     public List<TsKvEntry> getlatestData(@PathVariable("deviceId") String deviceId
-    ,@PathVariable("keys") Collection<String> keys)
-            throws Exception{
+    ,@PathVariable("keys") Collection<String> keys) {
         try{
             ListenableFuture<List<TsKvEntry>> tskventry = baseTimeseriesService.findLatest(toUUID(deviceId), keys);
             List<TsKvEntry> ls = tskventry.get();

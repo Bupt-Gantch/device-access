@@ -20,14 +20,13 @@ public class EventController extends BaseController {
                                             @RequestParam long startTime,
                                             @RequestParam long endTime,
                                             @RequestParam(required = false) String idOffset,
-                                            @RequestParam(required = false) boolean ascOrder) throws Exception {
-        if (StringUtil.isEmpty(deviceId)) {
-            throw new Exception("can't be empty");
-        }
+                                            @RequestParam(required = false) boolean ascOrder) {
         try {
-
-            TimePageLink pageLink = new TimePageLink(limit,startTime,endTime,ascOrder);
-            pageLink.setIdOffset(idOffset==null?null:toUUID(idOffset));
+            if (StringUtil.isEmpty(deviceId)) {
+                throw new Exception("can't be empty");
+            }
+            TimePageLink pageLink = new TimePageLink(limit, startTime, endTime, ascOrder);
+            pageLink.setIdOffset(idOffset == null ? null : toUUID(idOffset));
             TimePageData<Event> event = baseEventService.findEvents(tenantId, deviceId, pageLink);
             return event;
         } catch (Exception e) {
@@ -40,16 +39,15 @@ public class EventController extends BaseController {
     @RequestMapping(value = "/event/newest/{tenantId}/{deviceId}", method = RequestMethod.GET)
     public TimePageData<Event> getEventById(@PathVariable("deviceId") String deviceId,
                                             @PathVariable("tenantId") Integer tenantId,
-                                            @RequestParam(required = false) String idOffset ,
+                                            @RequestParam(required = false) String idOffset,
                                             @RequestParam int limit
-                                            ) throws Exception {
-        if (StringUtil.isEmpty(deviceId)) {
-            throw new Exception("can't be empty");
-        }
+    ) {
         try {
-
+            if (StringUtil.isEmpty(deviceId)) {
+                throw new Exception("can't be empty");
+            }
             TimePageLink pageLink = new TimePageLink(limit);
-            pageLink.setIdOffset(idOffset==null?null:toUUID(idOffset));
+            pageLink.setIdOffset(idOffset == null ? null : toUUID(idOffset));
             TimePageData<Event> event = baseEventService.findEvents(tenantId, deviceId, pageLink);
             return event;
         } catch (Exception e) {
