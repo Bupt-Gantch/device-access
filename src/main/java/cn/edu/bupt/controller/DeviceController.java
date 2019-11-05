@@ -34,7 +34,12 @@ public class DeviceController extends BaseController {
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/tenant/deviceCount", method = RequestMethod.GET)
     public Long getTenantDeviceCount(@RequestParam Integer tenantId)  {
-        return deviceService.findDevicesCount(tenantId);
+        try {
+            return deviceService.findDevicesCount(tenantId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('CUSTOMER_USER')")
@@ -43,7 +48,12 @@ public class DeviceController extends BaseController {
 //        try {
 //            if (getCurrentUser().getCustomerId().equals(customerId)||
 //                    ((getCurrentUser().getAuthority().equals(Authority.TENANT_ADMIN))&&getCurrentUser().getTenantId().equals(tenantId))) {
-                return deviceService.findCustomerDevicesCount(customerId);
+        try {
+            return deviceService.findCustomerDevicesCount(customerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
 //            }else{
 //                throw new IOTException("You aren't authorized to perform this operation!", IOTErrorCode.AUTHENTICATION);
 //            }
@@ -101,6 +111,7 @@ public class DeviceController extends BaseController {
 //            deviceService.sendMessage(device, "删除设备："+device.getName());
         } catch (Exception e) {
             e.printStackTrace();
+            return;
         }
     }
 
@@ -145,7 +156,7 @@ public class DeviceController extends BaseController {
     @RequestMapping(value = "/tenant/devices/SearchCount/{tenantId}", method = RequestMethod.GET)
     public Long getTenantDevicesCountByTextSearch(
             @PathVariable("tenantId") Integer tenantId,
-            @RequestParam String textSearch) throws Exception {
+            @RequestParam String textSearch)  {
         try {
             TextPageLink pageLink = new TextPageLink(1,textSearch);
             Long count = deviceService.findDevicesCountWithTextSearch(tenantId,pageLink);
@@ -162,7 +173,7 @@ public class DeviceController extends BaseController {
     public Long getCustomerDevicesCountByTextSearch(
             @PathVariable("tenantId") Integer tenantId,
             @PathVariable("customerId") Integer customerId,
-            @RequestParam String textSearch) throws Exception {
+            @RequestParam String textSearch) {
         try {
             TextPageLink pageLink = new TextPageLink(1,textSearch);
             Long count = deviceService.findDevicesCountWithTextSearch(tenantId,customerId,pageLink);
@@ -182,7 +193,7 @@ public class DeviceController extends BaseController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String textSearch,
             @RequestParam(required = false) String idOffset,
-            @RequestParam(required = false) String textOffset) throws Exception {
+            @RequestParam(required = false) String textOffset) {
         try {
             TextPageLink pageLink = new TextPageLink(limit, textSearch,idOffset==null?null:toUUID(idOffset), textOffset);
             /*TextPageData<Device> ls = deviceService.findDevicesByTenantId(tenantId, pageLink);
@@ -199,7 +210,7 @@ public class DeviceController extends BaseController {
     //删除tenant下的所有设备
     //@PreAuthorize("#oauth2.hasScope('all')")
     @RequestMapping(value = "/devices/{tenantId}", method = RequestMethod.DELETE)
-    public void deleteDevicesByTenantId(@PathVariable("tenantId") Integer tenantId) throws Exception {
+    public void deleteDevicesByTenantId(@PathVariable("tenantId") Integer tenantId)  {
         try {
             deviceService.deleteDevicesByTenantId(tenantId);
         } catch (Exception e) {
@@ -212,7 +223,7 @@ public class DeviceController extends BaseController {
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value="/device/{tenantId}/{name}",method = RequestMethod.GET)
     public Optional<Device> getDeviceByTenantIdAndName(@PathVariable("tenantId") Integer tenantId,
-                                                       @PathVariable("name") String name) throws Exception{
+                                                       @PathVariable("name") String name) {
         try{
             Optional<Device> optionalDevice = deviceService.findDeviceByTenantIdAndName(tenantId, name);
             return optionalDevice;
@@ -228,7 +239,7 @@ public class DeviceController extends BaseController {
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value="/assign/customer/{deviceId}/{customerId}",method = RequestMethod.GET)
     public Device assignDeviceToCustomer(@PathVariable("deviceId") String deviceId,
-                                         @PathVariable("customerId")Integer customerId) throws Exception{
+                                         @PathVariable("customerId")Integer customerId){
 
         try{
             Device device = deviceService.assignDeviceToCustomer(toUUID(deviceId), customerId);
@@ -242,7 +253,7 @@ public class DeviceController extends BaseController {
     //取消分配某个设备给客户
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value="/unassign/customer/{deviceId}",method = RequestMethod.DELETE)
-    public Device unassignDeviceFromCustomer(@PathVariable("deviceId")String deviceId) throws Exception{
+    public Device unassignDeviceFromCustomer(@PathVariable("deviceId")String deviceId) {
         try{
             Device device = deviceService.unassignDeviceFromCustomer(toUUID(deviceId));
             return device;
@@ -256,7 +267,7 @@ public class DeviceController extends BaseController {
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('TENANT_ADMIN')")
     @RequestMapping(value = "/unassign/{tenantId}/{customerId}",method = RequestMethod.DELETE)
     public void unassignCustomerDevices(@PathVariable("tenantId") Integer tenantId,
-                                        @PathVariable("customerId") Integer customerId) throws Exception{
+                                        @PathVariable("customerId") Integer customerId){
         try{
             deviceService.unassignCustomerDevices(tenantId, customerId);
         }catch (Exception e){
@@ -275,7 +286,7 @@ public class DeviceController extends BaseController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String textSearch,
             @RequestParam(required = false) String idOffset,
-            @RequestParam(required = false) String textOffset) throws Exception {
+            @RequestParam(required = false) String textOffset)  {
         try {
             TextPageLink pageLink = new TextPageLink(limit, textSearch, idOffset==null?null:toUUID(idOffset), textOffset);
             return checkNotNull(deviceService.findDevicesByTenantIdAndCustomerId(tenantId, customerId, pageLink));
@@ -296,7 +307,7 @@ public class DeviceController extends BaseController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String textSearch,
             @RequestParam(required = false) String idOffset,
-            @RequestParam(required = false) String textOffset) throws Exception {
+            @RequestParam(required = false) String textOffset)  {
         try {
             TextPageLink pageLink = new TextPageLink(limit, textSearch, idOffset==null?null:toUUID(idOffset), textOffset);
             return checkNotNull(deviceService.findDevicesByTenantIdAndSiteId(tenantId, siteId, pageLink));
@@ -384,58 +395,78 @@ public class DeviceController extends BaseController {
 
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/devices/suspend/{tenantId}", method = RequestMethod.PUT)
-    public void suspendDevices(@PathVariable("tenantId") Integer tenantId) throws Exception {
-        deviceService.suspendedDeviceByTenantId(tenantId);
+    public void suspendDevices(@PathVariable("tenantId") Integer tenantId)  {
+        try {
+            deviceService.suspendedDeviceByTenantId(tenantId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAuthority('SYS_ADMIN')")
     @RequestMapping(value = "/devices/activate/{tenantId}", method = RequestMethod.PUT)
-    public void activateDevices(@PathVariable("tenantId") Integer tenantId) throws Exception {
-        deviceService.activatedDeviceByTenantId(tenantId);
+    public void activateDevices(@PathVariable("tenantId") Integer tenantId)  {
+        try {
+            deviceService.activatedDeviceByTenantId(tenantId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     //分配网关下所有设备包括网关自己
     @RequestMapping(value = "/assignAll/{customerId}", method = RequestMethod.GET)
-    public void assignAllDevicesToCustomer(@PathVariable("customerId") Integer customerId, @RequestParam String gateway_user) throws Exception{
-        if(deviceService.findDeviceByTenantIdAndName(2, gateway_user).isPresent()){
-            Device parentDevice = deviceService.findDeviceByTenantIdAndName(2, gateway_user).get();
-            UUID pId = parentDevice.getId();
-            int gatewayCustomerId = parentDevice.getCustomerId();
-            if(gatewayCustomerId == 1){
-                deviceService.assignDeviceToCustomer(pId, customerId);
-                gatewayCustomerId = customerId;
-            }
-            if(gatewayCustomerId == customerId){
-                List<Device> devices = deviceService.findDeviceByParentDeviceId(pId.toString(), new TextPageLink(255));
-                for(Device de : devices){
-                    deviceService.assignDeviceToCustomer(de.getId(),customerId );
+    public void assignAllDevicesToCustomer(@PathVariable("customerId") Integer customerId, @RequestParam String gateway_user) {
+        try {
+            if(deviceService.findDeviceByTenantIdAndName(2, gateway_user).isPresent()){
+                Device parentDevice = deviceService.findDeviceByTenantIdAndName(2, gateway_user).get();
+                UUID pId = parentDevice.getId();
+                int gatewayCustomerId = parentDevice.getCustomerId();
+                if(gatewayCustomerId == 1){
+                    deviceService.assignDeviceToCustomer(pId, customerId);
+                    gatewayCustomerId = customerId;
                 }
-            }else {
-                throw new Exception("The gateway has been assigned!");
+                if(gatewayCustomerId == customerId){
+                    List<Device> devices = deviceService.findDeviceByParentDeviceId(pId.toString(), new TextPageLink(255));
+                    for(Device de : devices){
+                        deviceService.assignDeviceToCustomer(de.getId(),customerId );
+                    }
+                }else {
+                    throw new Exception("The gateway has been assigned!");
+                }
+            }else{
+                throw new Exception("Don't has such gateway!");
             }
-        }else{
-            throw new Exception("Don't has such gateway!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
         }
     }
 
     @RequestMapping(value = "/unassign/{customerId}", method = RequestMethod.GET)
-    public void unassignGatewayAndDevice(@PathVariable("customerId") Integer customerId, @RequestParam String gateway_name) throws Exception{
-        if(deviceService.findDeviceByTenantIdAndName(2, gateway_name).isPresent()){
-            Device gateway = deviceService.findDeviceByTenantIdAndName(2, gateway_name).get();
-            UUID gId = gateway.getId();
-            int gatewayCustomerId = gateway.getCustomerId();
-            if(gatewayCustomerId == customerId){
-                deviceService.unassignDeviceFromCustomer(gId);
-                List<Device> devices = deviceService.findDeviceByParentDeviceId(gId.toString(), new TextPageLink(255));
-                for(Device de : devices){
-                    deviceService.unassignDeviceFromCustomer(de.getId());
+    public void unassignGatewayAndDevice(@PathVariable("customerId") Integer customerId, @RequestParam String gateway_name) {
+        try {
+            if(deviceService.findDeviceByTenantIdAndName(2, gateway_name).isPresent()){
+                Device gateway = deviceService.findDeviceByTenantIdAndName(2, gateway_name).get();
+                UUID gId = gateway.getId();
+                int gatewayCustomerId = gateway.getCustomerId();
+                if(gatewayCustomerId == customerId){
+                    deviceService.unassignDeviceFromCustomer(gId);
+                    List<Device> devices = deviceService.findDeviceByParentDeviceId(gId.toString(), new TextPageLink(255));
+                    for(Device de : devices){
+                        deviceService.unassignDeviceFromCustomer(de.getId());
+                    }
+                }else{
+                    throw new Exception("Don't has been authorized!");
                 }
-            }else{
-                throw new Exception("Don't has been authorized!");
-            }
 
-        }else{
-            throw new Exception("Don't has such gateway!");
+            }else{
+                throw new Exception("Don't has such gateway!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
         }
     }
 
@@ -443,27 +474,31 @@ public class DeviceController extends BaseController {
      * 解绑网关并删除网管下所有设备
      * @param customerId
      * @param gateway_name
-     * @throws Exception
      */
     @RequestMapping(value = "/removeGateway/{customerId}", method = RequestMethod.GET)
-    public void removeGateway(@PathVariable("customerId") Integer customerId, @RequestParam String gateway_name) throws Exception{
-        if(deviceService.findDeviceByTenantIdAndName(2, gateway_name).isPresent()){
-            Device gateway = deviceService.findDeviceByTenantIdAndName(2, gateway_name).get();
-            UUID gId = gateway.getId();
-            int gatewayCustomerId = gateway.getCustomerId();
-            // 校验用户操作权限
-            if(gatewayCustomerId == customerId){
-                deviceService.unassignDeviceFromCustomer(gId);
-                List<Device> devices = deviceService.findDeviceByParentDeviceId(gId.toString(), new TextPageLink(255));
-                for(Device de : devices){
-                    deviceService.deleteDevice(de.getId());
+    public void removeGateway(@PathVariable("customerId") Integer customerId, @RequestParam String gateway_name) {
+        try {
+            if(deviceService.findDeviceByTenantIdAndName(2, gateway_name).isPresent()){
+                Device gateway = deviceService.findDeviceByTenantIdAndName(2, gateway_name).get();
+                UUID gId = gateway.getId();
+                int gatewayCustomerId = gateway.getCustomerId();
+                // 校验用户操作权限
+                if(gatewayCustomerId == customerId){
+                    deviceService.unassignDeviceFromCustomer(gId);
+                    List<Device> devices = deviceService.findDeviceByParentDeviceId(gId.toString(), new TextPageLink(255));
+                    for(Device de : devices){
+                        deviceService.deleteDevice(de.getId());
+                    }
+                }else{
+                    throw new Exception("Don't has been authorized!");
                 }
-            }else{
-                throw new Exception("Don't has been authorized!");
-            }
 
-        }else{
-            throw new Exception("Don't has such gateway!");
+            }else{
+                throw new Exception("Don't has such gateway!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
         }
     }
 
