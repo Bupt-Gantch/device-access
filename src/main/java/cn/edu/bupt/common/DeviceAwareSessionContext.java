@@ -24,6 +24,9 @@ public abstract class DeviceAwareSessionContext implements SessionContext {
     public boolean login(DeviceCredentals credentials){
         DeviceAuthResult res =  authService.process(credentials );
         if (res.isSuccess()) {
+            if(res.getDeviceId() == null || res.getDeviceId().length() ==0) {
+                return false;
+            }
             Optional<Device> deviceOpt = authService.findDeviceById(res.getDeviceId());
             if (deviceOpt.isPresent()) {
                 device = deviceOpt.get();

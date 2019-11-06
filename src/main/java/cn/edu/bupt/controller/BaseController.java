@@ -81,7 +81,7 @@ public class BaseController {
     }*/
 
     UUID toUUID(String id) {
-        if(id==null) {
+        if(id==null || id.length() == 0) {
             return null;
         }else {
             return UUID.fromString(id);

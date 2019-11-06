@@ -36,7 +36,7 @@ public class AttributeController extends BaseController {
     //@PreAuthorize("#oauth2.hasScope('all') OR hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value="/attributes/{deviceId}/{attributeKeys}", method = RequestMethod.GET)
     public List<AttributeKvEntry> getAttribute(
-            @PathVariable("deviceId") String deviceId, @PathVariable("attributeKeys") Collection<String> attributeKeys) throws Exception {
+            @PathVariable("deviceId") String deviceId, @PathVariable("attributeKeys") Collection<String> attributeKeys){
         try {
             ListenableFuture<List<AttributeKvEntry>> listListenableFuture =
                     baseAttributesService.find(toUUID(deviceId), attributeKeys);
@@ -69,8 +69,9 @@ public class AttributeController extends BaseController {
     @RequestMapping(value="/allattributes/{deviceId}/{keys}",method = RequestMethod.DELETE)
     public void removeAllAttributes(
             @PathVariable("deviceId") String deviceId, @PathVariable("keys") String keys) {
+
+        List<String> ls = new ArrayList<>();
         try{
-            List<String> ls = new ArrayList<>();
             ls.add(keys);
             baseAttributesService.removeAll(toUUID(deviceId), ls);
         }catch (Exception e){

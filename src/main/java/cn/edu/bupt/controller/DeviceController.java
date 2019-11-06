@@ -1,7 +1,6 @@
 package cn.edu.bupt.controller;
 
 import cn.edu.bupt.actor.service.FromServerMsgProcessor;
-import cn.edu.bupt.dao.exception.IOTException;
 import cn.edu.bupt.dao.page.TextPageData;
 import cn.edu.bupt.dao.page.TextPageLink;
 import cn.edu.bupt.message.BasicFromServerMsg;
@@ -93,9 +92,14 @@ public class DeviceController extends BaseController {
 
         try {
             if (StringUtil.isEmpty(strDeviceId)) {
-                throw new Exception("device id can't be empty");
+                throw new Exception("delete fail: device id can't be empty");
             }
+
             Device device = deviceService.findDeviceById(toUUID(strDeviceId));
+            if (device == null) {
+                throw new Exception("delete fail: device does not exist");
+            }
+
             deviceService.deleteDevice(toUUID(strDeviceId));
 
 //            deviceService.sendMessage(device, "删除设备："+device.getName());
@@ -131,7 +135,8 @@ public class DeviceController extends BaseController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String textSearch,
             @RequestParam(required = false) String idOffset,
-            @RequestParam(required = false) String textOffset) throws Exception{
+            @RequestParam(required = false) String textOffset) {
+
         try{
             TextPageLink pageLink = new TextPageLink(limit, textSearch, idOffset==null?null:toUUID(idOffset), textOffset);
             return checkNotNull(deviceService.findDeviceByParentDeviceId(parentDeviceId, pageLink));
@@ -145,11 +150,11 @@ public class DeviceController extends BaseController {
     @RequestMapping(value = "/tenant/devices/SearchCount/{tenantId}", method = RequestMethod.GET)
     public Long getTenantDevicesCountByTextSearch(
             @PathVariable("tenantId") Integer tenantId,
-            @RequestParam String textSearch) throws Exception {
+            @RequestParam String textSearch) {
         try {
             TextPageLink pageLink = new TextPageLink(1,textSearch);
             Long count = deviceService.findDevicesCountWithTextSearch(tenantId,pageLink);
-            System.out.println(count);
+//            System.out.println(count);
             return count;
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,11 +167,11 @@ public class DeviceController extends BaseController {
     public Long getCustomerDevicesCountByTextSearch(
             @PathVariable("tenantId") Integer tenantId,
             @PathVariable("customerId") Integer customerId,
-            @RequestParam String textSearch) throws Exception {
+            @RequestParam String textSearch) {
         try {
             TextPageLink pageLink = new TextPageLink(1,textSearch);
             Long count = deviceService.findDevicesCountWithTextSearch(tenantId,customerId,pageLink);
-            System.out.println(count);
+//            System.out.println(count);
             return count;
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,7 +187,7 @@ public class DeviceController extends BaseController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String textSearch,
             @RequestParam(required = false) String idOffset,
-            @RequestParam(required = false) String textOffset) throws Exception {
+            @RequestParam(required = false) String textOffset)  {
         try {
             TextPageLink pageLink = new TextPageLink(limit, textSearch,idOffset==null?null:toUUID(idOffset), textOffset);
             /*TextPageData<Device> ls = deviceService.findDevicesByTenantId(tenantId, pageLink);
